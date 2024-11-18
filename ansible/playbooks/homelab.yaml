@@ -1,0 +1,6 @@
+---
+- hosts: alma-homelab
+  become: true
+  roles:
+    - base
+    - k3s

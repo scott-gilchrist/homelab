@@ -1,0 +1,4 @@
+---
+- name: Echo some text using debug
+  ansible.builtin.debug:
+    msg: "k3s role"

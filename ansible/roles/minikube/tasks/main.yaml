@@ -1,0 +1,11 @@
+---
+- name: Echo some text using debug
+  ansible.builtin.debug:
+    msg: "minikube role"
+
+- name: Install podman
+  ansible.builtin.dnf:
+    update_cache: true
+    name:
+      - podman
+    state: present

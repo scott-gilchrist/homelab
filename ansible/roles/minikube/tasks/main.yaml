@@ -21,6 +21,8 @@
     mode: "0440"
 
 - name: Download the latest stable version of kubectl
+  vars:
+    stable_version: "{{ lookup('url', 'https://storage.googleapis.com/kubernetes-release/release/stable.txt') }}"
   ansible.builtin.get_url:
     url: "https://storage.googleapis.com/kubernetes-release/release/{{ stable_version }}/bin/linux/amd64/kubectl"
     dest: /tmp/kubectl
@@ -32,11 +34,16 @@
     creates: /usr/local/bin/kubectl
   become: true
 
-- name: Verify kubectl installation
-  ansible.builtin.command:
-    cmd: kubectl version -o yaml
-  register: kubectl_version_output
+- name: Check if kubectl binary exists
+  ansible.builtin.stat:
+    path: /usr/local/bin/kubectl
+  register: kubectl_binary
 
-- name: Debug kubectl version output
-  ansible.builtin.debug:
-    msg: "{{ kubectl_version_output.stdout }}"
+- name: Fail if kubectl is not installed
+  ansible.builtin.fail:
+    msg: "kubectl binary not found at /usr/local/bin/kubectl"
+  when: not kubectl_binary.stat.exists
+
+- name: Start minikube
+  ansible.builtin.command:
+    cmd: minikube start --driver docker

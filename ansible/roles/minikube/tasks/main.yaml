@@ -1,49 +1,24 @@
 ---
-- name: Echo some text using debug
-  ansible.builtin.debug:
-    msg: "minikube role"
-
-- name: Install podman
-  ansible.builtin.dnf:
-    update_cache: true
-    name:
-      - podman
-    state: present
-
-- name: Allow user "scott" to run podman without password
-  ansible.builtin.lineinfile:
-    path: /etc/sudoers.d/scott
-    line: "scott ALL=(ALL) NOPASSWD: /usr/bin/podman"
-    create: yes
-    state: present
-    owner: root
-    group: root
-    mode: "0440"
-
-- name: Download the latest stable version of kubectl
-  vars:
-    stable_version: "{{ lookup('url', 'https://storage.googleapis.com/kubernetes-release/release/stable.txt') }}"
+- name: Download Minikube binary
   ansible.builtin.get_url:
-    url: "https://storage.googleapis.com/kubernetes-release/release/{{ stable_version }}/bin/linux/amd64/kubectl"
-    dest: /tmp/kubectl
-    mode: "0755"
+    url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+    dest: /tmp/minikube-linux-amd64
+    mode: '0755'
 
-- name: Move kubectl to /usr/local/bin
+- name: Install Minikube binary
   ansible.builtin.command:
-    cmd: mv /tmp/kubectl /usr/local/bin/kubectl
-    creates: /usr/local/bin/kubectl
-  become: true
+    cmd: install /tmp/minikube-linux-amd64 /usr/local/bin/minikube
+    removes: /usr/local/bin/minikube
 
-- name: Check if kubectl binary exists
-  ansible.builtin.stat:
-    path: /usr/local/bin/kubectl
-  register: kubectl_binary
+- name: Verify Minikube installation
+  ansible.builtin.command:
+    cmd: minikube version
+      register: minikube_version_output
 
-- name: Fail if kubectl is not installed
-  ansible.builtin.fail:
-    msg: "kubectl binary not found at /usr/local/bin/kubectl"
-  when: not kubectl_binary.stat.exists
+- name: Display Minikube version
+  ansible.builtin.debug:
+    msg: "{{ minikube_version_output.stdout }}"
 
 - name: Start minikube
   ansible.builtin.command:
-    cmd: minikube start --driver docker
+    cmd: minikube start --driver=podman

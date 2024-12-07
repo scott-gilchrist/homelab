@@ -8,7 +8,7 @@
 - name: Install Minikube binary
   ansible.builtin.command:
     cmd: install /tmp/minikube-linux-amd64 /usr/local/bin/minikube
-    removes: /usr/local/bin/minikube
+    creates: /usr/local/bin/minikube
 
 - name: Verify Minikube installation
   ansible.builtin.command:

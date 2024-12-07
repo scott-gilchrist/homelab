@@ -13,7 +13,7 @@
 - name: Verify Minikube installation
   ansible.builtin.command:
     cmd: minikube version
-      register: minikube_version_output
+    register: minikube_version_output
 
 - name: Display Minikube version
   ansible.builtin.debug:

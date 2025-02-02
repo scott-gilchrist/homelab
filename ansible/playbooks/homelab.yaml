@@ -3,4 +3,6 @@
   become: true
   roles:
     - base
-    - k3s
+    - podman
+    - kubectl
+    - minikube

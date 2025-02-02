@@ -1,0 +1,24 @@
+---
+- name: Download Minikube binary
+  ansible.builtin.get_url:
+    url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+    dest: /tmp/minikube-linux-amd64
+    mode: '0755'
+
+- name: Install Minikube binary
+  ansible.builtin.command:
+    cmd: install /tmp/minikube-linux-amd64 /usr/local/bin/minikube
+    creates: /usr/local/bin/minikube
+
+- name: Verify Minikube installation
+  ansible.builtin.command:
+    cmd: minikube version
+    register: minikube_version_output
+
+- name: Display Minikube version
+  ansible.builtin.debug:
+    msg: "{{ minikube_version_output.stdout }}"
+
+- name: Start minikube
+  ansible.builtin.command:
+    cmd: minikube start --driver=podman

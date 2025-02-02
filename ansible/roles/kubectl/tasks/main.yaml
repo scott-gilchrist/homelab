@@ -1,0 +1,24 @@
+---
+- name: Download the latest stable version of kubectl
+  vars:
+    stable_version: "{{ lookup('url', 'https://storage.googleapis.com/kubernetes-release/release/stable.txt') }}"
+  ansible.builtin.get_url:
+    url: "https://storage.googleapis.com/kubernetes-release/release/{{ stable_version }}/bin/linux/amd64/kubectl"
+    dest: /tmp/kubectl
+    mode: "0755"
+
+- name: Move kubectl to /usr/local/bin
+  ansible.builtin.command:
+    cmd: mv /tmp/kubectl /usr/local/bin/kubectl
+    creates: /usr/local/bin/kubectl
+  become: true
+
+- name: Check if kubectl binary exists
+  ansible.builtin.stat:
+    path: /usr/local/bin/kubectl
+  register: kubectl_binary
+
+- name: Fail if kubectl is not installed
+  ansible.builtin.fail:
+    msg: "kubectl binary not found at /usr/local/bin/kubectl"
+  when: not kubectl_binary.stat.exists

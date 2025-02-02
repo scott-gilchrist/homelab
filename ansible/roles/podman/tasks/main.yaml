@@ -1,0 +1,17 @@
+---
+- name: Install podman
+  ansible.builtin.dnf:
+    update_cache: true
+    name:
+      - podman
+    state: present
+
+- name: Allow user "scott" to run podman without password
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/scott
+    line: "scott ALL=(ALL) NOPASSWD: /usr/bin/podman"
+    create: yes
+    state: present
+    owner: root
+    group: root
+    mode: "0440"

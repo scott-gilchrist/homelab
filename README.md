@@ -1,6 +1,6 @@
-# homelab
+# SG Labs
 
-Homelab setup
+SG Labs infrastructure
 
 ## Ansible
 

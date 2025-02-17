@@ -1,6 +1,6 @@
 ---
 - hosts: kube01
-  become: true
+  # become: true
   roles:
     - base
     - k3s

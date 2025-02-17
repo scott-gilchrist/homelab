@@ -10,3 +10,4 @@
       - curl
       - wget
     state: present
+  become: true

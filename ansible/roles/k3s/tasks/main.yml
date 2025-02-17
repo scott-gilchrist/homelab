@@ -1,26 +1,44 @@
 ---
-- name: Ensure curl is installed
-  apt:
-    name: curl
-    state: present
-  when: ansible_os_family == "Debian"
+- name: Download K3s install script
+  get_url:
+    url: https://get.k3s.io
+    dest: /home/kube/install-k3s.sh
+    mode: '0755'
+    owner: kube
+    group: kube
 
-- name: Ensure curl is installed (RedHat)
-  yum:
-    name: curl
-    state: present
-  when: ansible_os_family == "RedHat"
+- name: Install K3s as kube user
+  command: /home/kube/install-k3s.sh
+  become_user: kube
+  environment:
+    INSTALL_K3S_EXEC: "--write-kubeconfig-mode 644"
 
-- name: Download and run k3s installation script
-  shell: |
-    curl -sfL {{ k3s_install_script_url }} | INSTALL_K3S_VERSION={{ k3s_version }} sh -s - {{ k3s_server_options if k3s_server_options else '' }} {{ k3s_agent_options if k3s_agent_options else '' }}
-  args:
-    executable: /bin/bash
-  become: yes
+- name: Ensure .kube directory exists
+  file:
+    path: /home/kube/.kube
+    state: directory
+    owner: kube
+    group: kube
+    mode: '0755'
 
-- name: Ensure k3s is running
-  systemd:
-    name: k3s
-    state: started
-    enabled: yes
-  become: yes
+- name: Copy kubeconfig for kube user
+  copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: /home/kube/.kube/config
+    remote_src: yes
+    owner: kube
+    group: kube
+    mode: '0600'
+
+- name: Add KUBECONFIG to kube user's .bashrc
+  lineinfile:
+    path: /home/kube/.bashrc
+    line: 'export KUBECONFIG=/home/kube/.kube/config'
+    create: yes
+
+- name: Ensure k3s binary is owned by kube user
+  file:
+    path: /usr/local/bin/k3s
+    owner: kube
+    group: kube
+    mode: '0755'

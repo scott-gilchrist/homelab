@@ -1,0 +1,26 @@
+---
+- name: Ensure curl is installed
+  apt:
+    name: curl
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Ensure curl is installed (RedHat)
+  yum:
+    name: curl
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Download and run k3s installation script
+  shell: |
+    curl -sfL {{ k3s_install_script_url }} | INSTALL_K3S_VERSION={{ k3s_version }} sh -s - {{ k3s_server_options if k3s_server_options else '' }} {{ k3s_agent_options if k3s_agent_options else '' }}
+  args:
+    executable: /bin/bash
+  become: yes
+
+- name: Ensure k3s is running
+  systemd:
+    name: k3s
+    state: started
+    enabled: yes
+  become: yes

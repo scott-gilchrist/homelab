@@ -1,0 +1,5 @@
+---
+k3s_version: "v1.26.5+k3s1"  # Specify the k3s version
+k3s_install_script_url: "https://get.k3s.io"
+k3s_server_options: ""  # Additional options for the k3s server
+k3s_agent_options: ""   # Additional options for the k3s agent

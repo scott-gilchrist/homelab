@@ -1,0 +1,7 @@
+#SPDX-License-Identifier: MIT-0
+---
+# Example handler (not used in this role)
+- name: Restart Helm service
+  service:
+    name: helm
+    state: restarted

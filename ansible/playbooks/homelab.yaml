@@ -4,5 +4,6 @@
   roles:
     - base
     - k3s
+    - helm
   vars:
     k3s_server_options: "--disable traefik --disable servicelb"

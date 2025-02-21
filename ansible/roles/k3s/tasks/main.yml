@@ -1,0 +1,47 @@
+---
+
+- name: Download K3s install script
+  get_url:
+    url: https://get.k3s.io
+    dest: /home/kube/install-k3s.sh
+    mode: '0755'
+    owner: kube
+    group: kube
+
+- name: Install K3s as kube user
+  command: /home/kube/install-k3s.sh
+  become_user: kube
+  environment:
+    INSTALL_K3S_EXEC: "--write-kubeconfig-mode 644"
+
+- name: Ensure .kube directory exists
+  file:
+    path: /home/kube/.kube
+    state: directory
+    owner: kube
+    group: kube
+    mode: '0755'
+
+- name: Copy kubeconfig for kube user
+  copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: /home/kube/.kube/config
+    remote_src: yes
+    owner: kube
+    group: kube
+    mode: '0600'
+  become: true
+
+- name: Add KUBECONFIG to kube user's .bashrc
+  lineinfile:
+    path: /home/kube/.bashrc
+    line: 'export KUBECONFIG=/home/kube/.kube/config'
+    create: yes
+
+- name: Ensure k3s binary is owned by kube user
+  file:
+    path: /usr/local/bin/k3s
+    owner: kube
+    group: kube
+    mode: '0755'
+  become: true

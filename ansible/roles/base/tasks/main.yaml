@@ -1,15 +1,13 @@
 ---
-# This role contains common tasks to run on all (RHEL) nodes
-- name: Install EPEL
-  ansible.builtin.dnf:
-    name: epel-release
-    state: present
-
+# This role contains common tasks to run on all (debian) nodes
 - name: Install base packages
-  ansible.builtin.dnf:
+  ansible.builtin.apt:
     update_cache: true
     name:
       - openssh-server
       - git
       - htop
+      - curl
+      - wget
     state: present
+  become: true

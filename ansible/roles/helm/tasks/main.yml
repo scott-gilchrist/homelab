@@ -1,0 +1,32 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: Ensure curl is installed
+  apt:
+    name: curl
+    state: present
+    update_cache: yes
+
+- name: Download the Helm installation script
+  get_url:
+    url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    dest: /tmp/get_helm.sh
+    mode: '0755'
+
+- name: Run the Helm installation script
+  command: /tmp/get_helm.sh
+  args:
+    creates: /usr/local/bin/helm  # Skip if Helm is already installed
+
+- name: Verify Helm installation
+  command: helm version
+  register: helm_version_output
+  changed_when: false
+
+- name: Display Helm version
+  debug:
+    msg: "{{ helm_version_output.stdout }}"
+
+- name: Clean up the installation script
+  file:
+    path: /tmp/get_helm.sh
+    state: absent

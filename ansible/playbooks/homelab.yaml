@@ -1,8 +1,9 @@
 ---
-- hosts: alma-homelab
-  become: true
+- hosts: kube01
+  # become: true
   roles:
     - base
-    - podman
-    - kubectl
-    - minikube
+    - k3s
+    - helm
+  vars:
+    k3s_server_options: "--disable traefik --disable servicelb"

@@ -1,0 +1,5 @@
+---
+- hosts: kube01
+  become: true
+  roles:
+    - helm
